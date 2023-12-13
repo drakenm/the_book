@@ -2,7 +2,7 @@
 iterating on s2, we now refactor the area fn into a struct method with impl
 */
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 struct Rectangle {
     width: u32,
     height: u32,
@@ -17,11 +17,20 @@ impl Rectangle {
         return self.width > other.width && self.height > other.height;
     }
 
-    fn square(size: u32) -> Self {
-        return Self {
-            width: size,
-            height: size,
-        };
+    fn set_width(&mut self, width: u32) {
+        self.width = width;
+    }
+
+    fn max(self, other:Rectangle) -> Rectangle {
+        Rectangle {
+            width: self.width.max(other.width),
+            height: self.height.max(other.height),
+        }
+    }
+
+    fn set_to_max(&mut self, other: Rectangle) {
+        let max = self.max(other);
+        *self = max;
     }
 }
 
@@ -64,4 +73,38 @@ fn main() {
     let area1 = r.area();
     let area2 = Rectangle::area(&**r);
     assert_eq!(area1, area2);
+
+    // methods and ownership
+    println!("Methods and Ownership...");
+    let mut rect = Rectangle {
+        width: 0,
+        height: 0,
+    };
+
+    println!("{}", rect.area());
+    // let other_rect = Rectangle {
+    //     width: 1,
+    //     height: 1,
+    // };
+
+    // this will move the struct because the struct does not implement Copy; rect will lose all permissions...
+    // let max_rect = rect.max(other_rect);
+
+    // set_width requires write permissions, meaning the variable must be declared as mut
+    rect.set_width(1);
+
+    // let rect_ref = &rect;
+
+    // rect_ref.set_width(2); // rect_ref is an immutable reference to a mutable var, so this can't work.
+    // proper way to do this would be:
+    // let mut rect_ref = &mut rect;
+
+
+    /*
+        Good Moves and Bad Moves
+        Rectangle struct will have too derive copy and clone to accomplish this
+    */
+    let mut rect = Rectangle { width: 0, height: 1 };
+    let other_rect = Rectangle { width: 1, height: 0 };
+    rect.set_to_max(other_rect);
 }
