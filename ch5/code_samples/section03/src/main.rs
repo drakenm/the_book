@@ -56,4 +56,12 @@ fn main() {
     println!("can rec1 hold rect2? {}", rect1.can_hold(&rect2));
     println!("can rec1 hold rect3? {}", rect1.can_hold(&rect3));
 
+    // understanding differences and similarities of method calls vs function calls
+    let r = &mut Box::new(Rectangle {
+        width: 1,
+        height:2,
+    });
+    let area1 = r.area();
+    let area2 = Rectangle::area(&**r);
+    assert_eq!(area1, area2);
 }
